@@ -10,6 +10,8 @@ public class Amostra {
     
     // ATRIBUTOS
     
+    int quantInstancias;  // Quantidade de Instâncias da Amostra
+    int quantAtributos;   // Quantidade de Atributos da Amostra
     ArrayList<Instancia> colecaoInstancia = new ArrayList<Instancia>();
 
     // CONSTRUTORES
@@ -43,9 +45,6 @@ public class Amostra {
     // MÉTODOS
     
     private void importarIntancias(String path) throws IOException {
-        
-        int quantInstancias;  // Quantidade de Instâncias da Amostra
-        int quantAtributos;   // Quantidade de Atributos da Amostra
         
         FileReader arq;       // Ponteiro para arquivo lido
         String aux[];         // Coleção de Strings auxiliares
@@ -85,12 +84,16 @@ public class Amostra {
         for(Instancia i : colecaoInstancia) {
             
             System.out.printf("%4d ", i.id);
-            System.out.println(i.atributos[0] + " " +
+            System.out.printf("%6.2f ", i.atributos[0]);
+            System.out.printf("%6.2f ", i.atributos[1]);
+            System.out.printf("%6.2f ", i.atributos[2]);
+            System.out.printf("%6.2f\n", i.atributos[3]);
+            /*System.out.println(i.atributos[0] + " " +
                                i.atributos[1] + " " +
                                i.atributos[2] + " " +
                                i.atributos[3] + " " +
                                i.classe + " " +
-                               i.classeEstimada);
+                               i.classeEstimada);*/
         }
         System.out.println();
         

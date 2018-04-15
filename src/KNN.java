@@ -4,12 +4,14 @@ public class KNN {
     
     // ATRIBUTOS
     Amostra amostraExp;    // Amostra que sofrerá modificações
+    float distancias[];    // Distâncias da Intância de teste
     
     // CONSTRUTORES
     
     public KNN(Amostra base){
         
         this.amostraExp = base;
+        distancias = new float[base.quantInstancias];
         
     }//fim[Construtor]
     
@@ -84,5 +86,32 @@ public class KNN {
         this.amostraExp.embaralharAmostras(seed);
         
     }//fim[embaralharAmostra]
+    
+    public void distanciaEuclediana(Instancia alvo) {
+        
+        int i, j;   // variavel para laços
+        int d;
+        
+        for(i = 1; i < amostraExp.quantInstancias; i++) {
+            
+            d = 0;
+            for(j = 0; j < amostraExp.quantAtributos; j++) {
+                
+                
+                d += Math.pow(amostraExp.colecaoInstancia.get(i).atributos[j] - alvo.atributos[j],2);
+                //System.out.println("Calc " + amostraExp.colecaoInstancia.get(i).atributos[j] + "-" + alvo.atributos[j]);
+                
+            }//fim[for]
+            System.out.println("Valor de D:" + d);
+            distancias[i] = (float) Math.sqrt(d);
+            
+        }//fim[for]
+        
+        System.out.println("Distâncias");
+        for(i = 0; i < amostraExp.quantInstancias; i++) {
+            System.out.println(distancias[i]);
+        }
+        
+    }//fim[distanciaEuclediana]
 
 }//fim[KNN]

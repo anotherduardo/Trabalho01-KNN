@@ -31,13 +31,25 @@ public class Teste {
 
     public static void main(String[] args) {
         
-        Amostra am = new Amostra("src/base/dados2.txt");
+        Amostra am = new Amostra("src/base/dados3.txt");
         am.exibeAmostra();
         
-        //capturandoParametros();
-        System.out.println("Testes com KNN");
+        
+        capturandoParametros();
+        //System.out.println("Testes com KNN");
         KNN knn = new KNN(am);
-        knn.zScore();
+        //knn.zScore();
+        //knn.amostraExp.exibeAmostra();
+        
+        //Instancia alvo = knn.amostraExp.colecaoInstancia.get(0);
+        
+        //knn.distanciaEuclediana(alvo);
+        
+        Kfold kfold = new Kfold(k, knn);
+        kfold.dividirFolds();
+        kfold.avaliarKNN();
+        
+        //System.out.println(Math.round(3.75));
         
     }//fim[MAIN]
     

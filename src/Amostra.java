@@ -78,25 +78,61 @@ public class Amostra {
         
     }//fim[importarInstancias]
     
-    public void exibeAmostra() {
+    public void exibeAmostra(String msg, boolean acuracia) {
         
+        System.out.println(msg);
         System.out.println(" id at1 at2 at3 at4 cls est");
-        for(Instancia i : colecaoInstancia) {
+        
+        if(acuracia) {
             
-            System.out.printf("%4d ", i.id);
-            System.out.printf("%6.2f ", i.atributos[0]);
-            System.out.printf("%6.2f ", i.atributos[1]);
-            System.out.printf("%6.2f ", i.atributos[2]);
-            System.out.printf("%6.2f\n", i.atributos[3]);
-            /*System.out.println(i.atributos[0] + " " +
-                               i.atributos[1] + " " +
-                               i.atributos[2] + " " +
-                               i.atributos[3] + " " +
-                               i.classe + " " +
-                               i.classeEstimada);*/
+            for(Instancia i : colecaoInstancia) {
+                
+                System.out.printf("%4d ", i.id);
+                System.out.printf("%12.8f ", i.atributos[0]);
+                System.out.printf("%12.8f ", i.atributos[1]);
+                System.out.printf("%12.8f ", i.atributos[2]);
+                System.out.printf("%12.8f", i.atributos[3]);
+                System.out.printf("%4d\n", i.classe);
+                
+            }
+            
+        }
+        else {
+            for(Instancia i : colecaoInstancia) {
+                
+                System.out.printf("%4d ", i.id);
+                System.out.printf("%6.2f ", i.atributos[0]);
+                System.out.printf("%6.2f ", i.atributos[1]);
+                System.out.printf("%6.2f ", i.atributos[2]);
+                System.out.printf("%6.2f", i.atributos[3]);
+                System.out.printf("%4d\n", i.classe);
+            }
         }
         System.out.println();
         
     }//fim[exibe Amostra]
 
+    public void redistribuirAmostras() {
+        
+        int i, j;                         // Para laços
+        ArrayList<Instancia> novaColecao; // Coleção com instâncias distribuídas
+        
+        novaColecao = new ArrayList<Instancia>();
+        
+        // Percorrendo as classes (ESTÁTICO)
+        for(i = 1; i <= 3; i++) {
+            
+            for(j = 0; j < quantInstancias; j++)
+            if(colecaoInstancia.get(j).classe == i)
+                novaColecao.add(colecaoInstancia.get(j));
+            
+        }//fim[for]
+        
+        // Substituindo por nova coleção
+        colecaoInstancia.clear();
+        colecaoInstancia = novaColecao;
+        
+    }//fim[redistribuirAmostras]    
+    
+    
 }//fim[Amostra]

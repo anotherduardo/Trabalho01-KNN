@@ -2,54 +2,111 @@ import java.util.Scanner;
 
 public class Teste {
     
-    static boolean zscore = false;
-    static int k;
+    static boolean zscore     = false;
+    static boolean rand = false;
+    static int seed;
+    static int k_fold;
+    static int k_knn;
+    static boolean debug;
     
     static void capturandoParametros() {
-        Scanner scn = new Scanner(System.in); 
         
-        System.out.println("Entre com o valor de K:");
-        k = Integer.parseInt(scn.nextLine());
+        String op;   // Opcoes digitadas
+        Scanner scn; // Scanner de entrada
+        
+        scn = new Scanner(System.in);
+        
+        System.out.println("Entre com o valor de K do KNN:");
+        k_knn = Integer.parseInt(scn.nextLine());
+        
+        System.out.println("Entre com o valor de K do KFOLD:");
+        k_fold = Integer.parseInt(scn.nextLine());
         
         System.out.println("Deseja normalizar os dados? [Y/N]");
-        String op = scn.nextLine();
+        op = scn.nextLine();
         
         if(op.toCharArray()[0] =='Y'|| op.toCharArray()[0]== 'y')
             zscore = true;
         else
             zscore = false;
         
-        System.out.println("Valor de K:"+ k);
-        if(zscore)
-            System.out.println("Normalização Ativada");
+        System.out.println("Deseja embaralhar a amostra? [Y/N]");
+        op = scn.nextLine();
+        if(op.toCharArray()[0] =='Y'|| op.toCharArray()[0]== 'y') {
+            
+            rand = true;
+            System.out.println("Digite o seed:");
+            op = scn.nextLine();
+            seed = Integer.parseInt(op);
+        }
         else
-            System.out.println("Normalização Desativada");
+            rand = false;
         
+        System.out.println("Deseja ativar o debug? [Y/N]");
+        op = scn.nextLine();
+        if(op.toCharArray()[0] =='Y'|| op.toCharArray()[0]== 'y')
+            debug = true;
+        else
+            debug = false;
         scn.close();
         
     }//fim[capturandoParametros]
+    
+    static void relatorioInicial() {
+        System.out.println("===============================");
+        System.out.println("Valor do K (knn)\t" + k_knn);
+        System.out.println("Valor do K (k-fold)\t" + k_fold);
+        if(zscore)
+            System.out.println("Normalizacao Ativada");
+        else
+            System.out.println("Normalizacao Desativada");
+        
+        if(rand)
+            System.out.println("Sorteio Ativado.:Seed-->"+ seed);
+        else
+            System.out.println("Sorteio Desativado \t"+ seed);
+        
+        if(debug)
+            System.out.println("Debug Ativado");
+        else
+            System.out.println("Debug Desativado");
+        
+        System.out.println("===============================");
+        
+    }//fim[relatorioInicial]
 
     public static void main(String[] args) {
         
-        Amostra am = new Amostra("src/base/dados3.txt");
-        am.exibeAmostra();
-        
-        
+        // Importando a base e os parametros principais
+        Amostra am = new Amostra("src/base/dados.txt");
         capturandoParametros();
-        //System.out.println("Testes com KNN");
-        KNN knn = new KNN(am);
-        //knn.zScore();
-        //knn.amostraExp.exibeAmostra();
+        relatorioInicial();
         
-        //Instancia alvo = knn.amostraExp.colecaoInstancia.get(0);
+        if(debug)
+            am.exibeAmostra("Dados importados do arquivo", true);
         
-        //knn.distanciaEuclediana(alvo);
+        KNN knn = new KNN(am, k_knn);   // Importando a base para o KNN
+        if(zscore) {                    // Usar o Zscore?
+            knn.zScore();
+            if(debug)
+                knn.amostraExp.exibeAmostra("Dados normalizados", true);
+        }
         
-        Kfold kfold = new Kfold(k, knn);
-        kfold.dividirFolds();
-        kfold.avaliarKNN();
+        if(rand) {                      // Embaralhar a amostra?
+            knn.embaralharAmostra(seed);
+            if(debug)
+                knn.amostraExp.exibeAmostra("Dados embaralhados", true);
+        }
         
-        //System.out.println(Math.round(3.75));
+        // Distribuindo as Instâncias nos respectivos folds
+        knn.amostraExp.redistribuirAmostras();
+        if(debug)
+            knn.amostraExp.exibeAmostra("Dados pos distribuicao", true);
+        
+        
+        Kfold kfold = new Kfold(k_fold, knn);
+        kfold.dividirFolds(debug);
+        kfold.avaliarKNN(false);
         
     }//fim[MAIN]
     

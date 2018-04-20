@@ -3,15 +3,15 @@
 public class KNN {
     
     // ATRIBUTOS
+    int k_knn;                 // K vizinhos do KNN
     Amostra amostraExp;    // Amostra que sofrerá modificações
-    float distancias[];    // Distâncias da Intância de teste
     
     // CONSTRUTORES
     
-    public KNN(Amostra base){
+    public KNN(Amostra base, int k){
         
+        this.k_knn = k;
         this.amostraExp = base;
-        distancias = new float[base.quantInstancias];
         
     }//fim[Construtor]
     
@@ -87,31 +87,54 @@ public class KNN {
         
     }//fim[embaralharAmostra]
     
-    public void distanciaEuclediana(Instancia alvo) {
+    public void distanciaEuclediana(Instancia origem, Instancia alvo) {
         
-        int i, j;   // variavel para laços
-        int d;
+        float d; // valor da distância (colocada no alvo)
+        int j; // para laços
         
-        for(i = 1; i < amostraExp.quantInstancias; i++) {
+        d = 0;
+        for(j = 0; j < amostraExp.quantAtributos; j++) {
             
-            d = 0;
-            for(j = 0; j < amostraExp.quantAtributos; j++) {
-                
-                
-                d += Math.pow(amostraExp.colecaoInstancia.get(i).atributos[j] - alvo.atributos[j],2);
-                //System.out.println("Calc " + amostraExp.colecaoInstancia.get(i).atributos[j] + "-" + alvo.atributos[j]);
-                
-            }//fim[for]
-            System.out.println("Valor de D:" + d);
-            distancias[i] = (float) Math.sqrt(d);
+            // Para debug do d
+            //System.out.println("Valor atua de d:"+d);
+            //System.out.println("Origem Atri:" + origem.atributos[j]+" - " + alvo.atributos[j] + ": "
+            //        + Math.pow(origem.atributos[j] - alvo.atributos[j], 2));
+            
+            
+            d += Math.pow(origem.atributos[j] - alvo.atributos[j], 2);
             
         }//fim[for]
         
-        System.out.println("Distâncias");
-        for(i = 0; i < amostraExp.quantInstancias; i++) {
-            System.out.println(distancias[i]);
-        }
+        alvo.distancia = (float) Math.sqrt(d);
         
     }//fim[distanciaEuclediana]
+    
+    
+    public void validarZscore() {
+        
+        float quantAtrib[];// Soma de cada coluna
+        int j;              // Para laços
+        
+        quantAtrib = new float[amostraExp.quantAtributos];
+        
+        System.out.println("Quantidade de atributos:" + amostraExp.quantAtributos);
+        for(j = 0; j < amostraExp.quantAtributos; j++)
+            quantAtrib[0] = 0;
+        
+        System.out.println("A soma de todos os atributos(coluna) deve ser zero:");
+        
+        for(Instancia i : amostraExp.colecaoInstancia) {
+            
+            for(j = 0; j < amostraExp.quantAtributos; j++) {
+                System.out.println("Atr:"+j+" Somando:"+quantAtrib[j] +" com " + i.atributos[j]);
+                quantAtrib[j] += i.atributos[j];
+            }
+            System.out.println("Atributo:"+ quantAtrib[j] + "\n\n");
+        }
+        
+        for(j = 0; j < amostraExp.quantAtributos; j++)
+            System.out.println("Atributo " + j + ":"+quantAtrib[j]);
+        
+    }//fim[validarZscore]
 
 }//fim[KNN]

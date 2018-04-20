@@ -1,116 +1,192 @@
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Kfold {
     
     
-    int k;               // Número de Folds
-    KNN knn;             // Dados do KNN e amostras
-    int tamKs[];         // Tamanho individual de cada fold
-    int foldsTreinados[];// Relação de qual fold é o teste
+    int k_folds;           // Número de Folds
+    KNN knn;               // Dados do KNN e amostras
+    //int tamKs[];         // Tamanho individual de cada fold
+    //int foldsTreinados[];// Relação de qual fold é o teste
+    int mapaInstancias[];  // Mapeia teste e treinamento (indices)
     
     
     // CONSTRUTORES
     
     public Kfold(int k, KNN knn) {
         
-        this.k = k;
-        this.knn = knn; 
-        this.tamKs = new int[k];
-        this.foldsTreinados = new int[k];
+        this.k_folds = k;
+        this.knn = knn;
+        mapaInstancias = new int[knn.amostraExp.quantInstancias];
+        //this.tamKs = new int[k];
+        //this.foldsTreinados = new int[k];
         
     }//fim[construtor]
     
     // MÉTODOS
     
-    public void dividirFolds() {
+    // PRINCIPAL MÉTODO DO TRABALHO
+    public void avaliarKNN(boolean debug) {
         
-        int i, j;                   // Variavel para laços
-        int aux;                    // Inteiro auxiliar
+        int i, j, l;                      // Para laços
+        int acertos;                      // Quantidade de Acertos
+        int classeF;                      // Classe Final escolhida
+        int quantInst;                    // Quantidade de Instâncias
+        int knnAtual;                     // Valor atual do KNN(pode diminuir em empate)
+        boolean empate;                   // Se o KNN obteve empate
+        ArrayList<Instancia> listaDeComp; // Armazena uma cópia dos itens calculados
+        ArrayList<KVizinho> contagemK;    // Armazena uma cópia dos itens calculados
+        
+        classeF = 0;
+        acertos = 0;
+        contagemK = new ArrayList<KVizinho>();
+        listaDeComp = new ArrayList<Instancia>();
+        quantInst = knn.amostraExp.quantInstancias;
        
-        // Se divisao for exata
-        if(knn.amostraExp.quantInstancias % k == 0) {
-            
-            System.out.println("Divisão exata");
-            
-            for(i = 0; i < k; i++) {
-                tamKs[i] = knn.amostraExp.quantInstancias / k;
-                
-            }//fim[for]
-        }
         
-        // Senão: Folds heterogêneos
-        else {
-            
-            System.out.println("Folds desiguais");
-            
-            tamKs = new int[k];
-            
-            j = k -1;
-            for(i = 0; i < j; i++) {
-                //System.out.println("Divisao: " + Math.round((float)knn.amostraExp.quantInstancias / k));
-                tamKs[i] = Math.round((float) knn.amostraExp.quantInstancias / k);
-                
-            }//fim[for]
-            
-            aux = Math.round((float) knn.amostraExp.quantInstancias / k)*(k-1);
-            tamKs[i] = knn.amostraExp.quantInstancias-aux;
-        }
+        // LAÇOS
         
-        System.out.println("Tamanho dos Folds");
-        for(i = 0; i < k; i++) {
-            System.out.println("Fold " + (i+1) + ":" + tamKs[i]);
+        for(i = 1; i <= k_folds; i++) {
+            
+            if(debug)
+                System.out.println("Exetuando fold #:"+i);
+            
+            for(l = 0; l < quantInst; l++) {
+            
+                if(mapaInstancias[l] == i) {
+                    
+                    if(debug) {
+                        System.out.println("Testando Instancia ID:"+
+                            knn.amostraExp.colecaoInstancia.get(l).id + " classe " +
+                            knn.amostraExp.colecaoInstancia.get(l).classe);
+                    }
+                    
+                    for(j = 0; j < quantInst; j++) {
+                        
+                        if(mapaInstancias[j] != i) {
+                            
+                            // Calculando a distância
+                            knn.distanciaEuclediana(knn.amostraExp.colecaoInstancia.get(l),
+                                    knn.amostraExp.colecaoInstancia.get(j));
+                            
+                            // Montando a lista que será ordenada
+                            listaDeComp.add(knn.amostraExp.colecaoInstancia.get(j));
+                        }
+                        
+                    }//fim[Cálculo das distâncias]
+                    
+                    // Escolhendo o K vizinho
+                    Collections.sort(listaDeComp);
+                    
+                    if(debug)
+                        for(Instancia c:listaDeComp)
+                            System.out.println(c.distancia + "\t-->\t"+ c.classe);
+                    
+                    knnAtual = knn.k_knn;
+                    empate = true;
+                    while(empate) {
+                        
+                        contagemK.add(new KVizinho(1, 0));
+                        contagemK.add(new KVizinho(2, 0));
+                        contagemK.add(new KVizinho(3, 0));
+                        
+                        // Contagem das menores distâncias
+                        for(j = 0; j < knnAtual; j++)
+                            contagemK.get(listaDeComp.get(j).classe-1).somaVizinho();
+                        
+                        
+                        if(debug) {
+                            System.out.println("Objetos da contagem");
+                            for(KVizinho c:contagemK) 
+                                System.out.println(c.classe + "--> "+ c.quant);
+                        }
+                        
+                        // Ordenando o K que mais aparece
+                        Collections.sort(contagemK);
+                        
+                        if(debug) {
+                            System.out.println("Objetos da contagem, pos ordencao");
+                            for(KVizinho c:contagemK) {
+                                System.out.println(c.classe + "--> "+ c.quant);
+                            }
+                        }
+                        
+                        
+                        
+                        // Checando empate
+                        if(knnAtual != 1) {
+                            if(contagemK.get(0).quant != contagemK.get(1).quant)
+                                empate = false;
+                            else {
+                                if(debug)
+                                    System.out.println("Empatou novamente, valor do K: "+ knnAtual);
+                            }
+                                
+                        }
+                        else
+                            empate = false;
+                        
+                        knnAtual--;
+                        classeF = contagemK.get(0).classe;
+                        contagemK.clear();
+                        
+                    }//fim[Enquanto estiver empatado]
+                    
+                    
+                    // ENFIM, CLASSIFICANDO:
+                    if(knn.amostraExp.colecaoInstancia.get(l).classe == classeF)
+                        acertos++;
+                    
+                    listaDeComp.clear();
+                    
+                }// teste da amostra
+                
+            }//fim[Testando cada item do fold]
+            
+            
+        }//fim[Laço dos folds]
+        
+        System.out.println("Quantidade de acertos:" + acertos);
+        System.out.println("Porcentagem de acertos:" + (acertos*100.0)/quantInst + "%");
+        
+    }//fim[avaliarKNN]
+    
+    public void dividirFolds(boolean debug) {
+        
+        int i, j;               // Para laços
+        
+        // Preenchendo o mapeamento:
+        j = 1;
+        for(i = 0; i < knn.amostraExp.quantInstancias; i++) {
+            
+            mapaInstancias[i] = j;
+            j++;
+            if(j > k_folds)
+                j = 1;
             
         }//fim[for]
         
+        if(debug)
+            exibeDivisaoFolds();
+       
         
     }//fim[dividirFolds]
     
-    public void avaliarKNN() {
+    public void exibeDivisaoFolds() {
         
-        int i, j, l;    // variveis para laços
-        int e, d;       // intervalos do conjunto de treinamento
+        int i; // Para laços
         
-        // Setando o primeiro fold de teste (default)
-        foldsTreinados[0] = 1;
-        
-        e = d= 0;
-        
-        // Procurando o conjunto de teste
-        for(i = 0; i < k; i++) {
+        System.out.println("Divisao dos Folds");
+        System.out.println("# do Fold -->  ID da Instancia");
+        for(i = 0; i < knn.amostraExp.quantInstancias; i++) {
             
-            // Dentro do conjunto de treinamento...
-            if(foldsTreinados[i] == 1) {
-               d = e + (tamKs[i]-1);
-               
-               for(j = e; j <= d; j++) {
-                   
-                   for(l = 0; l < knn.amostraExp.quantInstancias; l++) {
-                       
-                       if(l >= e && l <= d) {
-                           
-                       }
-                       else {
-                           // Amostra na posicao j --> distancia com as demais
-                           knn.distanciaEuclediana(knn.amostraExp.colecaoInstancia.get(j));
-                           
-                           // Ordenar somente as distâncias que estão sendo comparadas
-                           
-                           // Cuidado com o Empate!
-                       }
-                   }
-               }
-               
-            }
+            System.out.println("[" + mapaInstancias[i] +"] --> "
+            + knn.amostraExp.colecaoInstancia.get(i).id);
             
-            //System.out.println("Intervalos: e->"+ e + " d->" + d);
-            
-            // Atualizando novo conjunto de treinamento
-            e = d+1;
-            foldsTreinados[i] = 0;
-            if(i != k-1)
-                foldsTreinados[i+1] = 1;
-                
         }//fim[for]
         
-    }//fim[avaliarKNN]
+        System.out.println("\n\n");
+        
+    }//fim[exibeDivisaoFolds]
 
 }//fim[Kfold]

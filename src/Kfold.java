@@ -6,8 +6,6 @@ public class Kfold {
     
     int k_folds;           // Número de Folds
     KNN knn;               // Dados do KNN e amostras
-    //int tamKs[];         // Tamanho individual de cada fold
-    //int foldsTreinados[];// Relação de qual fold é o teste
     int mapaInstancias[];  // Mapeia teste e treinamento (indices)
     
     
@@ -18,8 +16,6 @@ public class Kfold {
         this.k_folds = k;
         this.knn = knn;
         mapaInstancias = new int[knn.amostraExp.quantInstancias];
-        //this.tamKs = new int[k];
-        //this.foldsTreinados = new int[k];
         
     }//fim[construtor]
     
@@ -119,7 +115,7 @@ public class Kfold {
                                 empate = false;
                             else {
                                 if(debug)
-                                    System.out.println("Empatou novamente, valor do K: "+ knnAtual);
+                                    System.out.println("Empatou novamente, valor atual do K: "+ knnAtual);
                             }
                                 
                         }
@@ -177,11 +173,12 @@ public class Kfold {
         int i; // Para laços
         
         System.out.println("Divisao dos Folds");
-        System.out.println("# do Fold -->  ID da Instancia");
+        System.out.println("# do Fold -->  ID da Instancia --> Classe");
         for(i = 0; i < knn.amostraExp.quantInstancias; i++) {
             
             System.out.println("[" + mapaInstancias[i] +"] --> "
-            + knn.amostraExp.colecaoInstancia.get(i).id);
+            + knn.amostraExp.colecaoInstancia.get(i).id + " --> "
+            + knn.amostraExp.colecaoInstancia.get(i).classe);
             
         }//fim[for]
         

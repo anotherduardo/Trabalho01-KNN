@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Teste {
     
-    static boolean zscore     = false;
+    static boolean zscore = false;
     static boolean rand = false;
     static int seed;
     static int k_fold;
@@ -78,7 +78,7 @@ public class Teste {
     public static void main(String[] args) {
         
         // Importando a base e os parametros principais
-        Amostra am = new Amostra("src/base/dados.txt");
+        Amostra am = new Amostra("src/base/dados4.txt");
         capturandoParametros();
         relatorioInicial();
         
@@ -106,7 +106,7 @@ public class Teste {
         
         Kfold kfold = new Kfold(k_fold, knn);
         kfold.dividirFolds(debug);
-        kfold.avaliarKNN(false);
+        kfold.avaliarKNN(debug);
         
     }//fim[MAIN]
     

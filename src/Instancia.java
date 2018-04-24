@@ -5,7 +5,6 @@ public class Instancia implements Comparable<Instancia>{
     int id;             // Id da Instância
     float atributos[];  // Coleção de atributos
     int classe;         // Classe final
-    int classeEstimada; // Classe Estimada
     float distancia;    // Valor de cada distancia
     
     // CONSTRUTORES
@@ -24,7 +23,6 @@ public class Instancia implements Comparable<Instancia>{
         }//fim[for]
         
         classe = Integer.parseInt(dados[quantAtributos]);
-        classeEstimada = 0;
         distancia = 0;
         
     }//fim[Construtor]
